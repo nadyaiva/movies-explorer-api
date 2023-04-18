@@ -6,6 +6,7 @@ const ConflictError = require('../utils/ConflictError');
 const NotFoundError = require('../utils/NotFoundError');
 
 const getUserMe = (req, res, next) => {
+  console.log(req.user);
   User.findById(req.user._id)
     .orFail(() => {
       throw new NotFoundError('Пользователь не найден');
