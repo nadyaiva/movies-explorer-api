@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 const validator = require('validator');
 
-const userSchema = new mongoose.Schema({
+const movieSchema = new mongoose.Schema({
   contry: {
     type: String,
     required: true,
@@ -54,11 +54,12 @@ const userSchema = new mongoose.Schema({
     },
   },
   owner: {
-    _id: Schema.Types.ObjectId, //not sure about this
+    type: Schema.Types.ObjectId,
+    ref: 'user',
     requered: true,
   },
   movieId: {
-    _id: Schema.Types.ObjectId, //it should be from respond, so maybe it's not correct
+    type: String,
     requered: true,
   },
   nameRU: {
@@ -74,3 +75,5 @@ const userSchema = new mongoose.Schema({
     maxlength: 40,
   },
 });
+
+module.exports = mongoose.model('movie', movieSchema);
