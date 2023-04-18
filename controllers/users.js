@@ -1,4 +1,8 @@
 const User = require('../models/user');
+const bcrypt = require('bcryptjs');
+const BadRequestError = require('../utils/BadRequestError');
+const ConflictError = require('../utils/ConflictError');
+const NotFoundError = require('../utils/NotFoundError');
 
 const getUserMe = (req, res, next) => {
   User.findById(req.user._id)
@@ -11,17 +15,33 @@ const getUserMe = (req, res, next) => {
     });
 };
 
-const patchUserMe = (req, res, next) => {
-  const user = req.body;
-  console.log(req.body);
-  // User.findByIdAndUpdate(req.user._id, { name, about }, {
-  //   new: true,
-  //   runValidators: true,
-  // })
-
+const createUser = (req, res, next) => {
   const { email, name, password } = req.body;
 
-  User.create({ email, name, password })
+  bcrypt.hash(password, 10)
+    .then((hash) => User.create({
+      name, email, password: hash,
+    })).then((user) => res.status(201).send({
+      _id: user._id,
+      email: user.email,
+    }))
+    .catch((err) => {
+      console.log(err);
+
+      if (err.code === 11000) {
+        next(new ConflictError('Пользователь с таким email уже существует'));
+      } else if (err.name === 'ValidationError') {
+        next(new BadRequestError(`Переданы некорректные данные: ${err.message}`));
+      } else next(err);
+    });
+};
+
+const patchUserMe = (req, res, next) => {
+  const { email, name } = req.body;
+  User.findByIdAndUpdate(req.user._id, { email, name }, {
+    new: true,
+    runValidators: true,
+  })
     .then((user) => res.status(201).send(user))
     .catch((err) => {
       if (err.name === 'ValidationError') {
@@ -30,4 +50,4 @@ const patchUserMe = (req, res, next) => {
     });
 };
 
-module.exports = { getUserMe, patchUserMe }
+module.exports = { getUserMe, patchUserMe, createUser }

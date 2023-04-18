@@ -19,6 +19,8 @@
   },
   "homepage": "https://github.com/nadyaiva/movies-explorer-api#readme",
   "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "celebrate": "^15.0.1",
     "express": "^4.18.2",
     "mongod": "^2.0.0",
     "mongoose": "^7.0.3",
