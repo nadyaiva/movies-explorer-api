@@ -1,5 +1,6 @@
 const User = require('../models/user');
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 const BadRequestError = require('../utils/BadRequestError');
 const ConflictError = require('../utils/ConflictError');
 const NotFoundError = require('../utils/NotFoundError');
@@ -13,6 +14,21 @@ const getUserMe = (req, res, next) => {
     .catch((err) => {
       next(err);
     });
+};
+
+const signinUser = (req, res, next) => {
+  const { email, password } = req.body;
+
+  User.findUserByCredentials(email, password)
+    .then((user) => {
+      const token = jwt.sign(
+        { _id: user._id },
+        'dev-secret',
+        { expiresIn: '7d' },
+      );
+      res.status(200).send({ token });
+    })
+    .catch(next);
 };
 
 const createUser = (req, res, next) => {
@@ -50,4 +66,4 @@ const patchUserMe = (req, res, next) => {
     });
 };
 
-module.exports = { getUserMe, patchUserMe, createUser }
+module.exports = { getUserMe, patchUserMe, createUser, signinUser }

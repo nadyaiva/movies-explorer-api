@@ -6,7 +6,7 @@ const bodyParser = require('body-parser');
 const routerMovie = require('./routs/movie');
 const routerUser = require('./routs/user');
 const { Joi, celebrate, errors } = require('celebrate');
-const { createUser } =require('./controllers/users');
+const { createUser, signinUser } = require('./controllers/users');
 
 const app = express();
 
@@ -22,6 +22,13 @@ app.post('/signup', celebrate({
     name: Joi.string().min(2).max(30),
   }),
 }), createUser);
+
+app.post('/signin', celebrate({
+  body: Joi.object().keys({
+    email: Joi.string().required().email(),
+    password: Joi.string().required(),
+  }),
+}), signinUser);
 
 app.use('/user', routerUser);
 app.use('/movie', routerMovie);
