@@ -6,7 +6,6 @@ const ConflictError = require('../utils/ConflictError');
 const NotFoundError = require('../utils/NotFoundError');
 
 const getUserMe = (req, res, next) => {
-  console.log(req.user);
   User.findById(req.user._id)
     .orFail(() => {
       throw new NotFoundError('Пользователь не найден');
@@ -24,7 +23,7 @@ const signinUser = (req, res, next) => {
     .then((user) => {
       const token = jwt.sign(
         { _id: user._id },
-        'dev-secret',
+        NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret',
         { expiresIn: '7d' },
       );
       res.status(200).send({ token });

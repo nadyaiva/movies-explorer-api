@@ -1,4 +1,7 @@
 const Movie = require('../models/movie');
+const BadRequestError = require('../utils/BadRequestError');
+const ForbiddenError = require('../utils/ForbiddenError');
+const NotFoundError = require('../utils/NotFoundError');
 
 const getMovies = (req, res, next) => {
     Movie.find({}).then((movies) => res.send(movies))
@@ -6,8 +9,9 @@ const getMovies = (req, res, next) => {
 }
 
 const postMovie = (req, res, next) => {
+  console.log(req.body);
   const { country, director, duration , year, description, image, trailer, nameRU, nameEN, thumbnail, movieId } = req.body;
-  Movie.create({ country, director, duration , year, description, image, trailer, nameRU, nameEN, thumbnail, movieId })
+  Movie.create({ country, director, duration , year, description, image, trailer, nameRU, nameEN, thumbnail, movieId, owner: req.user._id })
     .then((movie) => res.status(201).send(movie))
     .catch((err) => {
       if (err.name === 'ValidationError') {
@@ -17,7 +21,7 @@ const postMovie = (req, res, next) => {
 };
 
 const deleteMovie = (req, res, next) => {
-  const { movieId } = req.body;
+  const { movieId } = req.params;
   Movie.findById(movieId)
     .orFail(() => {
       throw new NotFoundError('Передан несуществующий id карточки');
