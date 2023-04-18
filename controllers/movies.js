@@ -1,15 +1,13 @@
 const Movie = require('../models/movie');
 const BadRequestError = require('../utils/BadRequestError');
-const ForbiddenError = require('../utils/ForbiddenError');
 const NotFoundError = require('../utils/NotFoundError');
 
 const getMovies = (req, res, next) => {
-    Movie.find({}).then((movies) => res.send(movies))
+    Movie.find({}).populate(['owner']).then((movies) => res.send(movies))
     .catch(next);
 }
 
 const postMovie = (req, res, next) => {
-  console.log(req.body);
   const { country, director, duration , year, description, image, trailer, nameRU, nameEN, thumbnail, movieId } = req.body;
   Movie.create({ country, director, duration , year, description, image, trailer, nameRU, nameEN, thumbnail, movieId, owner: req.user._id })
     .then((movie) => res.status(201).send(movie))
