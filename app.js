@@ -12,7 +12,7 @@ const { requestLogger, errorLogger } = require('./middlewares/logger');
 const { Joi, celebrate, errors } = require('celebrate');
 const { createUser, signinUser } = require('./controllers/users');
 
-const { PORT = 3000, DB_ADDRESS = 'mongodb://localhost:27017/bitfilmsdb'} = process.env;
+const { PORT = 3002, DB_ADDRESS = 'mongodb://localhost:27017/bitfilmsdb'} = process.env;
 
 const app = express();
 app.use(cors());
