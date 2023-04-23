@@ -37,7 +37,7 @@ app.post('/signin', celebrate({
   }),
 }), signinUser);
 app.use(auth);
-app.use('/user', routerUser);
+app.use('/users', routerUser);
 app.use('/movies', routerMovie);
 app.use(errorLogger);
 app.use('*', (req, res, next) => {

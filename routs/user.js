@@ -3,7 +3,7 @@ const { celebrate, Joi } = require('celebrate');
 
 const { getUserMe, patchUserMe } = require('../controllers/users');
 
-routerUser.get('/', getUserMe);
+routerUser.get('/me', getUserMe);
 
 routerUser.patch('/me', celebrate({
   body: Joi.object().keys({

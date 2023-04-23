@@ -1,6 +1,7 @@
 const Movie = require('../models/movie');
 const BadRequestError = require('../utils/BadRequestError');
 const NotFoundError = require('../utils/NotFoundError');
+const ForbiddenError = require('../utils/ForbiddenError');
 
 const getMovies = (req, res, next) => {
     Movie.find({}).populate(['owner']).then((movies) => res.send(movies))
@@ -22,15 +23,18 @@ const deleteMovie = (req, res, next) => {
   const { movieId } = req.params;
   Movie.findById(movieId)
     .orFail(() => {
-      throw new NotFoundError('Передан несуществующий id карточки');
+      throw new NotFoundError('Передан несуществующий id фильма');
     })
     .then((movie) => {
-       res.send(movie)
-        .catch(next);
+      if (req.user._id !== movie.owner.toString()) {
+        throw new ForbiddenError('Попытка удалить не свой фильм');
+      } Movie.deleteOne(movie)
+      .then((movie) => res.send(movie))
+         .catch(next);
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        next(new BadRequestError('Некорректно передан id карточки'));
+        next(new BadRequestError('Некорректно передан id фильма'));
       } else next(err);
     });
 };
