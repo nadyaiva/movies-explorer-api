@@ -20,20 +20,22 @@ const getUserMe = (req, res, next) => {
 
 const signinUser = (req, res, next) => {
   const { email, password } = req.body;
-  console.log(req.body);
 
   User.findUserByCredentials(email, password)
     .then((user) => {
-      console.log(user);
       const token = jwt.sign(
         { _id: user._id },
         NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret',
         { expiresIn: '7d' },
       );
-      console.log(token);
       res.status(200).send({ token });
     })
-    .catch(next);
+    .catch((err) => {
+      if (err.name === 'ValidationError') {
+        next(new BadRequestError(`Переданы некорректные данные: ${err.message}`));
+      }
+      next(err);
+    });
 };
 
 const createUser = (req, res, next) => {
@@ -47,13 +49,10 @@ const createUser = (req, res, next) => {
       email: user.email,
     }))
     .catch((err) => {
-      console.log(err);
-
-      if (err.code === 11000) {
-        next(new ConflictError('Пользователь с таким email уже существует'));
-      } else if (err.name === 'ValidationError') {
+      if (err.name === 'ValidationError') {
         next(new BadRequestError(`Переданы некорректные данные: ${err.message}`));
-      } else next(err);
+      }
+      next(err);
     });
 };
 
@@ -65,9 +64,14 @@ const patchUserMe = (req, res, next) => {
   })
     .then((user) => res.status(201).send(user))
     .catch((err) => {
+      if (err.code === 11000) {
+        next(new ConflictError('Пользователь с таким email уже существует'));
+        return;
+      }
       if (err.name === 'ValidationError') {
         next(new BadRequestError(`Переданы некорректные данные: ${err.message}`));
-      } else next(err);
+      }
+      next(err);
     });
 };
 
