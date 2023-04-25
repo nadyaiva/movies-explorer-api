@@ -1,15 +1,16 @@
 const mainRouter = require('express').Router();
+const { Joi, celebrate } = require('celebrate');
 const routerMovie = require('./movie');
 const routerUser = require('./user');
 const auth = require('../middlewares/auth');
 const { createUser, signinUser } = require('../controllers/users');
-const { Joi, celebrate } = require('celebrate');
+const handleNotFoundError = require('../middlewares/handleNotFoundError');
 
 mainRouter.post('/signup', celebrate({
   body: Joi.object().keys({
     email: Joi.string().required().email(),
     password: Joi.string().required(),
-    name: Joi.string().min(2).max(30),
+    name: Joi.string().required().min(2).max(30),
   }),
 }), createUser);
 
@@ -22,5 +23,6 @@ mainRouter.post('/signin', celebrate({
 mainRouter.use(auth);
 mainRouter.use('/users', routerUser);
 mainRouter.use('/movies', routerMovie);
+mainRouter.use(handleNotFoundError);
 
 module.exports = mainRouter;

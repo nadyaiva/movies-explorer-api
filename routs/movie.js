@@ -7,7 +7,7 @@ const { getMovies, postMovie, deleteMovie } = require('../controllers/movies');
 
 routerMovie.get('/', getMovies);
 
-routerMovie.post('/',validateMoviePost, postMovie);
+routerMovie.post('/', validateMoviePost, postMovie);
 
 routerMovie.delete('/:movieId', celebrate({
   params: Joi.object().keys({

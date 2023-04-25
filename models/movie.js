@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
-const Schema = mongoose.Schema;
+
+const { Schema } = mongoose;
 const validator = require('validator');
 
 const movieSchema = new mongoose.Schema({
@@ -54,7 +55,7 @@ const movieSchema = new mongoose.Schema({
   },
   movieId: {
     type: Number,
-    requered: true,
+    required: true,
   },
   nameRU: {
     type: String,

@@ -1,6 +1,6 @@
-const User = require('../models/user');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const User = require('../models/user');
 const BadRequestError = require('../utils/BadRequestError');
 const ConflictError = require('../utils/ConflictError');
 const NotFoundError = require('../utils/NotFoundError');
@@ -28,7 +28,7 @@ const signinUser = (req, res, next) => {
         NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret',
         { expiresIn: '7d' },
       );
-      res.status(200).send({ token });
+      res.send({ token });
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
@@ -49,9 +49,15 @@ const createUser = (req, res, next) => {
       email: user.email,
     }))
     .catch((err) => {
-      if (err.name === 'ValidationError') {
+      if (err.name === 'ValidationError' || err.name === 'CastError') {
         next(new BadRequestError(`Переданы некорректные данные: ${err.message}`));
       }
+
+      if (err.code === 11000) {
+        next(new ConflictError('Пользователь с таким email уже существует'));
+        return;
+      }
+
       next(err);
     });
 };
@@ -75,4 +81,6 @@ const patchUserMe = (req, res, next) => {
     });
 };
 
-module.exports = { getUserMe, patchUserMe, createUser, signinUser }
+module.exports = {
+  getUserMe, patchUserMe, createUser, signinUser,
+};

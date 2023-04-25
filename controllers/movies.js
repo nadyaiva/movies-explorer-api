@@ -4,17 +4,41 @@ const NotFoundError = require('../utils/NotFoundError');
 const ForbiddenError = require('../utils/ForbiddenError');
 
 const getMovies = (req, res, next) => {
-    console.log(req.user._id);
-    Movie.find({ owner: req.user._id })
+  Movie.find({ owner: req.user._id })
     .then((movies) => {
       res.send(movies);
     })
     .catch(next);
-}
+};
 
 const postMovie = (req, res, next) => {
-  const { country, director, duration , year, description, image, trailerLink, nameRU, nameEN, thumbnail, movieId } = req.body;
-  Movie.create({ country, director, duration , year, description, image, trailerLink, nameRU, nameEN, thumbnail, movieId, owner: req.user._id })
+  const {
+    country,
+    director,
+    duration,
+    year,
+    description,
+    image,
+    trailerLink,
+    nameRU,
+    nameEN,
+    thumbnail,
+    movieId,
+  } = req.body;
+  Movie.create({
+    country,
+    director,
+    duration,
+    year,
+    description,
+    image,
+    trailerLink,
+    nameRU,
+    nameEN,
+    thumbnail,
+    movieId,
+    owner: req.user._id,
+  })
     .then((movie) => res.status(201).send(movie))
     .catch((err) => {
       if (err.name === 'ValidationError' || err.name === 'CastError') {
@@ -34,8 +58,8 @@ const deleteMovie = (req, res, next) => {
       if (req.user._id !== movie.owner.toString()) {
         throw new ForbiddenError('Попытка удалить не свой фильм');
       } Movie.deleteOne(movie)
-      .then((movie) => res.send(movie))
-         .catch(next);
+        .then((data) => res.send(data))
+        .catch(next);
     })
     .catch((err) => {
       if (err.name === 'CastError') {
